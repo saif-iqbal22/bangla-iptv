@@ -3,191 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Bangla IP TV - Live IP TV Streaming</title>
-    <!-- Clappr Video Player CDN -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>বাংলা আইপি টিভি</title>
+    <!-- HLS.js for streaming -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0f19; color: #f1f5f9; overflow-x: hidden; }
-
-        /* Top Navigation Bar */
-        .navbar { background-color: #111827; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f2937; position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 20px; font-weight: bold; color: #ef4444; display: flex; align-items: center; gap: 8px; }
-        .logo span { color: #fff; }
-        .live-tag { background: #ef4444; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        .live-tag i { font-size: 8px; animation: blink 1s infinite; }
-
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        /* Main Container Layout */
-        .app-container { display: flex; height: calc(100vh - 57px); }
-        @media (max-width: 900px) {
-            .app-container { flex-direction: column; height: auto; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0f111a;
+            color: #ffffff;
+            padding-bottom: 30px;
+        }
+        /* Header Style */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: #1a1d29;
+            border-bottom: 1px solid #2a2e3d;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .site-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .site-title .highlight {
+            color: #00ffcc;
+        }
+        .live-badge {
+            background-color: #e50914;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background-color: white;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
         }
 
-        /* Video Player Area */
-        .player-area { flex: 1; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; min-height: 400px; }
-        #player { width: 100%; height: 100%; }
-        .channel-title-bar { position: absolute; top: 15px; left: 15px; background: rgba(0, 0, 0, 0.75); padding: 6px 14px; border-radius: 6px; font-size: 14px; border-left: 3px solid #ef4444; z-index: 10; backdrop-filter: blur(5px); }
-
-        /* Sidebar Channel Section */
-        .sidebar-area { width: 350px; background-color: #111827; display: flex; flex-direction: column; border-left: 1px solid #1f2937; }
-        @media (max-width: 900px) {
-            .sidebar-area { width: 100%; height: 450px; }
+        /* Video Player Section */
+        .player-container {
+            width: 100%;
+            background-color: #000;
+            position: relative;
+            aspect-ratio: 16/9;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .current-channel-name {
+            padding: 8px 15px;
+            background: #141722;
+            font-size: 15px;
+            color: #ffcc00;
+            font-weight: 500;
         }
 
-        .sidebar-heading { padding: 15px; font-size: 15px; font-weight: 600; background: #1f2937; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-        
-        .search-container { padding: 12px; background: #111827; }
-        .search-container input { width: 100%; padding: 10px 14px; background: #1f2937; border: 1px solid #374151; border-radius: 6px; color: #fff; outline: none; font-size: 14px; }
-        .search-container input:focus { border-color: #ef4444; }
+        /* Search & Categories */
+        .controls-container {
+            padding: 12px 15px;
+        }
+        .search-box {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #2a2e3d;
+            background-color: #1a1d29;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 12px;
+        }
+        .search-box::placeholder {
+            color: #888;
+        }
 
-        /* Channel List Container */
-        .channel-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .channel-card { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 8px; background: #1f2937; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; }
-        .channel-card:hover { background: #374151; border-color: #4b5563; }
-        .channel-card.active { background: #ef4444; color: #fff; border-color: #f87171; }
-        
-        .channel-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #fff; padding: 2px; }
-        .channel-details h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-        .channel-details span { font-size: 11px; opacity: 0.8; }
-        .channel-card.active .channel-details span { opacity: 0.9; }
+        .categories {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+        .categories::-webkit-scrollbar {
+            display: none;
+        }
+        .cat-btn {
+            background-color: #1a1d29;
+            color: #ccc;
+            border: 1px solid #2a2e3d;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .cat-btn.active, .cat-btn:hover {
+            background-color: #00ffcc;
+            color: #000;
+            font-weight: bold;
+            border-color: #00ffcc;
+        }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #111827; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        /* Section Title */
+        .section-title {
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Channel Grid */
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 15px;
+        }
+        @media (max-width: 600px) {
+            .channel-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .channel-card {
+            background-color: #1a1d29;
+            border: 1px solid #2a2e3d;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+            position: relative;
+        }
+        .channel-card:active {
+            transform: scale(0.95);
+        }
+        .channel-card.active-channel {
+            border-color: #00ffcc;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+        }
+        .channel-logo-wrap {
+            width: 100%;
+            height: 70px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+        .channel-logo-wrap img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .channel-name {
+            font-size: 11px;
+            padding: 6px 4px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <div class="navbar">
-        <div class="logo"><i class="fa-solid fa-tv" style="color: #ef4444;"></i> Bangla IP <span>TV</span></div>
-        <div class="live-tag"><i class="fa-solid fa-circle"></i> LIVE STREAM</div>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-container">
+            <span style="font-size: 22px;">📺</span>
+            <h1 class="site-title">বাংলা <span class="highlight">আইপি টিভি</span></h1>
+        </div>
+        <div class="live-badge">
+            <span class="live-dot"></span> LIVE STREAM
+        </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="app-container">
+    <!-- Video Player -->
+    <div class="player-container">
+        <video id="video" controls autoplay playsinline></video>
+    </div>
+    <div class="current-channel-name" id="currentChannelText">চ্যানেল সিলেক্ট করুন</div>
+
+    <!-- Controls -->
+    <div class="controls-container">
+        <input type="text" class="search-box" id="searchBox" placeholder="চ্যানেল খুঁজুন..." onkeyup="filterChannels()">
         
-        <!-- Player Section -->
-        <div class="player-area">
-            <div class="channel-title-bar" id="currentChannelName">চ্যানেল লোড হচ্ছে...</div>
-            <div id="player"></div>
+        <div class="categories">
+            <button class="cat-btn active" onclick="filterCategory('all', this)">সকল</button>
+            <button class="cat-btn" onclick="filterCategory('News', this)">নিউজ</button>
+            <button class="cat-btn" onclick="filterCategory('Sports', this)">স্পোর্টস</button>
+            <button class="cat-btn" onclick="filterCategory('Entertainment', this)">বিনোদন</button>
         </div>
+    </div>
 
-        <!-- Sidebar Section -->
-        <div class="sidebar-area">
-            <div class="sidebar-heading">
-                <span>লাইভ টিভি চ্যানেলসমূহ</span>
-                <i class="fa-solid fa-list-ul"></i>
-            </div>
-            <div class="search-container">
-                <input type="text" id="searchBox" placeholder="চ্যানেল খুঁজুন..." onkeyup="searchChannel()">
-            </div>
-            <div class="channel-list" id="channelListBox">
-                <!-- ডায়নামিক চ্যানেল লিস্ট এখানে রেন্ডার হবে -->
-            </div>
-        </div>
+    <div class="section-title">
+        <span>লাইভ টিভি চ্যানেলসমূহ</span>
+    </div>
 
+    <!-- Channel List Grid -->
+    <div class="channel-grid" id="channelGrid">
+        <!-- চ্যানেলস ডায়নামিকালি লোড হবে -->
     </div>
 
     <script>
-        // আপনার দেওয়া প্লেলিস্ট থেকে সঠিক ও কার্যকর চ্যানেল লিংকগুলোর ডেটাসেট
-        const channelsData = [
-            { name: "সময় নিউজ টিভি (Somoy News)", category: "News", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1702/output/index.m3u8", logo: "https://i.ibb.co/5Gz1VjV/somoy.png" },
-            { name: "টি স্পোর্টস (T Sports)", category: "Sports", url: "https://tvsen7.aynaott.com/tsports-hd/index.m3u8", logo: "https://i.ibb.co/tsports.png" },
-            { name: "ইনডিপেন্ডেন্ট টিভি", category: "News", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1704/output/1704.m3u8", logo: "https://i.ibb.co/3s8Z12K/independent.png" },
-            { name: "চ্যানেল ২৪ (Channel 24)", category: "News", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1703/output/index.m3u8", logo: "https://i.ibb.co/channel24.png" },
-            { name: "একাত্তর টিভি (Ekattor TV)", category: "News", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1705/output/1705.m3u8", logo: "https://i.ibb.co/99Z99Z9/ekattor.png" },
-            { name: "চ্যানেল আই (Channel i)", category: "Entertainment", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1723/output/index.m3u8", logo: "https://i.ibb.co/4p3K28V/channeli.png" },
-            { name: "এনটিভি (NTV)", category: "Entertainment", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1716/output/index.m3u8", logo: "https://i.ibb.co/ntv.png" },
-            { name: "আরটিভি (RTV)", category: "Entertainment", url: "https://tvsen5.aynaott.com/RtvHD/index.m3u8", logo: "https://i.ibb.co/rtv.png" },
-            { name: "বাংলাভিশন (Bangla Vision)", category: "Entertainment", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1715/output/index.m3u8", logo: "https://i.ibb.co/banglavision.png" },
-            { name: "ডিবিসি নিউজ (DBC News)", category: "News", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1728/output/index.m3u8", logo: "https://i.ibb.co/dbc.png" },
-            { name: "নিউজ ২৪ (News 24)", category: "News", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1708/output/1708.m3u8", logo: "https://i.ibb.co/news24.png" },
-            { name: "এএখন টিভি (Ekhon TV)", category: "News", url: "https://tplay.live/out/bangladesh/ekhontv.index.m3u8", logo: "https://i.ibb.co/ekhon.png" },
-            { name: "দীপ্ত টিভি (Deepto TV)", category: "Entertainment", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1711/output/index.m3u8", logo: "https://i.ibb.co/88X88X8/deepto.png" },
-            { name: "মাছরাঙা টিভি (Maasranga)", category: "Entertainment", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1722/output/index.m3u8", logo: "https://i.ibb.co/maasranga.png" },
-            { name: "বিটিভি ন্যাশনাল (BTV)", category: "Government", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1709/output/1709.m3u8", logo: "https://i.ibb.co/btv.png" },
-            { name: "জিটিভি (GTV)", category: "Sports", url: "https://tvsen5.aynaott.com/Ravc7gPCZpxk/index.m3u8", logo: "https://i.ibb.co/0V88x2c/gtv.png" },
-            { name: "দুরন্ত টিভি (Duronto TV)", category: "Kids", url: "https://tvsen5.aynaott.com/durontotv/index.m3u8", logo: "https://i.ibb.co/duronto.png" },
-            { name: "এটিএন নিউজ (ATN News)", category: "News", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1706/output/1706.m3u8", logo: "https://i.ibb.co/atnnews.png" },
-            { name: "এশিয়ান টিভি (Asian TV)", category: "Entertainment", url: "https://tvsen6.aynaott.com/asiantv/index.m3u8", logo: "https://i.ibb.co/asiantv.png" },
-            { name: "বৈশাখী টিভি (Boishakhi TV)", category: "Entertainment", url: "https://tvsen6.aynaott.com/boishakhitv/index.m3u8", logo: "https://i.ibb.co/boishakhi.png" },
-            { name: "মোহনা টিভি (Mohona TV)", category: "Entertainment", url: "https://tvsen6.aynaott.com/mohonatv/index.m3u8", logo: "https://i.ibb.co/mohonatv.png" },
-            { name: "মাই টিভি (My TV)", category: "Entertainment", url: "https://tvsen6.aynaott.com/mytv/index.m3u8", logo: "https://i.ibb.co/mytv.png" },
-            { name: "জিটিভি বা অন্যান্য (AynaOtt HD)", category: "Sports", url: "https://tvsen5.aynaott.com/TnMn5kZz8aLm/index.m3u8", logo: "https://i.ibb.co/tsports.png" }
+        // আপনার দেওয়া তালিকা থেকে তৈরি করা চ্যানেল অ্যারে
+        const channels = [
+            { name: "Ananda TV (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-AnandaTV/index.m3u8" },
+            { name: "Ananda TV (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/anandatv/index.m3u8" },
+            { name: "Asian TV (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/asiantv/index.m3u8" },
+            { name: "ATN Bangla (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen5.aynaott.com/atnbangla/index.m3u8" },
+            { name: "ATN News (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-ATNNews/index.m3u8" },
+            { name: "Bangla TV (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/banglatv/index.m3u8" },
+            { name: "Bangla Vision (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1715/output/index.m3u8" },
+            { name: "Bijoy TV (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/bijoytv/index.m3u8" },
+            { name: "Boishakhi TV (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/boishakhitv/index.m3u8" },
+            { name: "BTV Chattogram", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-BTVChattagram/index.m3u8" },
+            { name: "BTV National (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1709/output/1709.m3u8" },
+            { name: "BTV News", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/BTVNews/index.m3u8" },
+            { name: "BTV World", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/btv_world/index.m3u8" },
+            { name: "Channel 9", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1729/output/index.m3u8" },
+            { name: "Channel 24 (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-Channel24HD/index.m3u8" },
+            { name: "Channel I (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1723/output/index.m3u8" },
+            { name: "DBC News (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1728/output/index.m3u8" },
+            { name: "Deepto TV (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1711/output/index.m3u8" },
+            { name: "Desh TV (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-DeshTV/index.m3u8" },
+            { name: "Duronto TV", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://trs1.aynaott.com/duronto/index.m3u8" },
+            { name: "Ekattor TV (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1705/output/1705.m3u8" },
+            { name: "Ekhon TV (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tplay.live/out/bangladesh/ekhontv.index.m3u8" },
+            { name: "Ekushey TV", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/etv/index.m3u8" },
+            { name: "Gazi TV (1080p)", category: "Sports", logo: "https://i.ibb.co/1n8J9nF/tsports.png", url: "http://tvn1.chowdhury-shaheb.com/gazitv/index.m3u8" },
+            { name: "Global TV", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/globaltvhd/index.m3u8" },
+            { name: "Independent TV (1080p)", category: "News", logo: "https://i.ibb.co/2n8J9nF/independent.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1704/output/1704.m3u8" },
+            { name: "Jamuna TV (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-JamunaTelevision/index.m3u8" },
+            { name: "Maasranga TV (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1722/output/index.m3u8" },
+            { name: "Mohona TV (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-MohonaTV/index.m3u8" },
+            { name: "My TV", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/mytv/index.m3u8" },
+            { name: "News 24 (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1708/output/1708.m3u8" },
+            { name: "NTV (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1716/output/index.m3u8" },
+            { name: "RTV (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-RTV/index.m3u8" },
+            { name: "SA TV", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/satv/index.m3u8" },
+            { name: "Sangsad TV", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-SangsadTV/index.m3u8" },
+            { name: "Somoy News TV (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1702/output/index.m3u8" },
+            { name: "T Sports (720p)", category: "Sports", logo: "https://i.ibb.co/1n8J9nF/tsports.png", url: "https://tvsen7.aynaott.com/tsports-hd/index.m3u8" },
+            { name: "Rajdhani TV", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://stream.shariarsuvo.com/hls5/rajdhanicable.m3u8" }
         ];
 
-        let playerInstance = null;
-
-        function renderChannels(list) {
-            const box = document.getElementById('channelListBox');
-            box.innerHTML = '';
-
-            if(list.length === 0) {
-                box.innerHTML = '<p style="text-align:center; color:#9ca3af; margin-top:20px; font-size:13px;">কোনো চ্যানেল পাওয়া যায়নি</p>';
-                return;
-            }
-
-            list.forEach((channel, index) => {
+        function loadChannels(filteredChannels) {
+            const grid = document.getElementById('channelGrid');
+            grid.innerHTML = "";
+            filteredChannels.forEach((channel) => {
                 const card = document.createElement('div');
-                card.className = `channel-card ${index === 0 && list === channelsData ? 'active' : ''}`;
-                card.onclick = () => {
-                    document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
-                    card.classList.add('active');
-                    playChannel(channel);
-                };
-
+                card.className = 'channel-card';
+                card.onclick = () => playChannel(channel, card);
                 card.innerHTML = `
-                    <img src="${channel.logo}" class="channel-logo" onerror="this.src='https://via.placeholder.com/40'">
-                    <div class="channel-details">
-                        <h4>${channel.name}</h4>
-                        <span>${channel.category}</span>
+                    <div class="channel-logo-wrap">
+                        <img src="${channel.logo}" alt="${channel.name}">
                     </div>
+                    <div class="channel-name">${channel.name}</div>
                 `;
-                box.appendChild(card);
+                grid.appendChild(card);
             });
         }
 
-        function playChannel(channel) {
-            document.getElementById('currentChannelName').innerText = channel.name;
+        function playChannel(channel, element) {
+            document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active-channel'));
+            element.classList.add('active-channel');
+            document.getElementById('currentChannelText').innerText = "প্লে হচ্ছে: " + channel.name;
 
-            if (playerInstance) {
-                playerInstance.destroy();
-                playerInstance = null;
+            const video = document.getElementById('video');
+            if (Hls.isSupported() && channel.url.includes('.m3u8')) {
+                const hls = new Hls();
+                hls.loadSource(channel.url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                });
+            } else {
+                video.src = channel.url;
+                video.play();
             }
-
-            const playerContainer = document.getElementById('player');
-            playerContainer.innerHTML = '';
-
-            playerInstance = new Clappr.Player({
-                source: channel.url,
-                parentId: "#player",
-                autoPlay: true,
-                width: '100%',
-                height: '100%',
-                mediacontrol: { seekbar: "#ef4444", buttons: "#ef4444" }
-            });
         }
 
-        function searchChannel() {
+        function filterCategory(category, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (category === 'all') {
+                loadChannels(channels);
+            } else {
+                const filtered = channels.filter(c => c.category === category);
+                loadChannels(filtered);
+            }
+        }
+
+        function filterChannels() {
             let query = document.getElementById('searchBox').value.toLowerCase();
-            let filtered = channelsData.filter(ch => ch.name.toLowerCase().includes(query));
-            renderChannels(filtered);
+            let filtered = channels.filter(c => c.name.toLowerCase().includes(query));
+            loadChannels(filtered);
         }
 
-        window.onload = () => {
-            renderChannels(channelsData);
-            if(channelsData.length > 0) {
-                playChannel(channelsData[0]);
-            }
-        };
+        // প্রথমে সব চ্যানেল লোড করুন
+        loadChannels(channels);
     </script>
 </body>
 </html>
