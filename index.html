@@ -220,6 +220,8 @@
         
         <div class="categories">
             <button class="cat-btn active" onclick="filterCategory('all', this)">সকল</button>
+            <button class="cat-btn" onclick="filterCategory('Bangladeshi', this)">বাংলাদেশী</button>
+            <button class="cat-btn" onclick="filterCategory('Indian', this)">ইন্ডিয়া</button>
             <button class="cat-btn" onclick="filterCategory('News', this)">নিউজ</button>
             <button class="cat-btn" onclick="filterCategory('Sports', this)">স্পোর্টস</button>
             <button class="cat-btn" onclick="filterCategory('Entertainment', this)">বিনোদন</button>
@@ -236,15 +238,23 @@
     </div>
 
     <script>
-        // আপডেট করা সম্পূর্ণ চ্যানেল লিস্ট
         const channels = [
+            // আপডেট করা সম্পূর্ণ চ্যানেল লিস্ট
+            // ইন্ডিয়ান চ্যানেলসমূহ
+            { name: "7S Music", category: "Indian", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://mumt03.tangotv.in/Dsly5z3H7SMUSIC/index.m3u8" },
+            { name: "9X Jalwa", category: "Indian", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://b.jsrdn.com/strm/channels/9xjalwa/master.m3u8" },
+            { name: "ABP News", category: "Indian", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-472500/abpnews/master.m3u8" },
+            { name: "Aaj Tak HD", category: "Indian", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "http://103.213.31.109:90/AajtakHD/playlist.m3u8" },
+
+
+            // বাংলাদেশী ও অন্যান্য চ্যানেল
             { name: "Ananda TV (1080p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-AnandaTV/index.m3u8" },
             { name: "Ananda TV (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/anandatv/index.m3u8" },
             { name: "Ananda TV (480p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "http://103.99.249.139/anandatv/index.m3u8" },
             { name: "Ananda TV", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/anandatv.stream/live-orgin/anandatv.stream/playlist.m3u8" },
             { name: "Asian TV (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/asiantv/index.m3u8" },
             { name: "ATN Bangla (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen5.aynaott.com/atnbangla/index.m3u8" },
-            { name: "ATN Music (360p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI/atnmusic.stream/playlist.m3u8" },
+            { name: "ATN Music (360p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://app.ncare.lcve/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI/atnmusic.stream/playlist.m3u8" },
             { name: "ATN News (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://bozztv.com/rongo/rongo-ATNNews/index.m3u8" },
             { name: "ATN News Alt (1080p)", category: "News", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1706/output/1706.m3u8" },
             { name: "Bangla TV (720p)", category: "Entertainment", logo: "https://i.ibb.co/30ZJ9nF/somoy.png", url: "https://tvsen6.aynaott.com/banglatv/index.m3u8" },
